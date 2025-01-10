@@ -18,7 +18,7 @@ public class PlayerDTO {
     @Min(value = 6, message = "Experience must be at least 6 months")
     private int monthsOfExperience;
 
-    private Long teamId;  // ID команди, до якої належить гравець
+    private Long teamId;
 
     public @NotBlank(message = "Player name is required") String getName() {
         return name;

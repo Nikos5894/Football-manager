@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-    // Пошук гравців за ім'ям команди через пов'язану сутність
+
     List<Player> findByTeamName(String teamName);
 
-    // Пошук гравця за віком (кастомний метод)
+
     List<Player> findByAgeGreaterThan(int age);
 }

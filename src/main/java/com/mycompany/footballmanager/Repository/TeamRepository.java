@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
-    // Пошук команди за назвою (кастомний метод)
+
     Team findByName(String name);
 
     @Query("SELECT t FROM Team t WHERE t.id = :id")

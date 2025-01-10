@@ -27,10 +27,10 @@ public class Team {
     private Double accountBalance;
 
     @Min(value = 0, message = "Commission percentage must be positive")  // Валідація: комісія
-    @Max(value = 10, message = "Commission percentage must be less than 10")  // Валідація: комісія
+    @Max(value = 10, message = "Commission percentage must be less than 10")
     private Double commissionPercentage;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)  // Один до багатьох
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<Player> players;
 
     public Long getId() {

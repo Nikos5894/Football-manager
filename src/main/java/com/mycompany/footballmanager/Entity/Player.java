@@ -25,8 +25,8 @@ public class Player {
     @Min(value = 6, message = "Experience must be at least 6 months")  // Валідація: досвід у місяцях
     private int monthsOfExperience;
 
-    @ManyToOne  // Багато гравців можуть належати одній команді
-    @JoinColumn(name = "team_id")  // Вказівка на зовнішній ключ
+    @ManyToOne
+    @JoinColumn(name = "team_id")
     @JsonIgnore
     private Team team;
 
