@@ -5,6 +5,9 @@ import com.mycompany.footballmanager.DTO.PlayerDTO;
 import com.mycompany.footballmanager.Entity.Player;
 import com.mycompany.footballmanager.Entity.PlayerTransferRequest;
 import com.mycompany.footballmanager.Entity.Team;
+import com.mycompany.footballmanager.Exception.InsufficientBalanceException;
+import com.mycompany.footballmanager.Exception.PlayerNotFoundException;
+import com.mycompany.footballmanager.Exception.TeamNotFoundException;
 import com.mycompany.footballmanager.Repository.PlayerRepository;
 import com.mycompany.footballmanager.Repository.TeamRepository;
 import jakarta.transaction.Transactional;
@@ -28,22 +31,32 @@ public class PlayerService {
 
     @Transactional
     public void transferPlayer(PlayerTransferRequest request) {
+        // Пошук гравця або помилка, якщо не знайдено
         Player player = playerRepository.findById(request.getPlayerId())
-                .orElseThrow(() -> new RuntimeException("Player not found"));
-        Team targetTeam = teamRepository.findById(request.getTargetTeamId())
-                .orElseThrow(() -> new RuntimeException("Target team not found"));
-        Team sourceTeam = player.getTeam();
+                .orElseThrow(() -> new PlayerNotFoundException("Player with ID " + request.getPlayerId() + " not found"));
 
+        // Пошук команди, яка купує, або помилка, якщо не знайдено
+        Team targetTeam = teamRepository.findById(request.getTargetTeamId())
+                .orElseThrow(() -> new TeamNotFoundException("Target team with ID " + request.getTargetTeamId() + " not found"));
+
+        // Пошук команди, яка продає
+        Team sourceTeam = player.getTeam();
+        if (sourceTeam == null) {
+            throw new TeamNotFoundException("Source team not found for player ID: " + request.getPlayerId());
+        }
+
+        // Обчислення вартості трансферу та комісії
         double transferValue = (player.getMonthsOfExperience() * 100000.0) / player.getAge();
         double commission = (transferValue * targetTeam.getCommissionPercentage()) / 100;
         double totalCost = transferValue + commission;
 
         if (targetTeam.getAccountBalance() < totalCost) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance for transfer. Required: " + totalCost + ", Available: " + targetTeam.getAccountBalance());
         }
 
         targetTeam.setAccountBalance(targetTeam.getAccountBalance() - totalCost);
         sourceTeam.setAccountBalance(sourceTeam.getAccountBalance() + totalCost);
+
         player.setTeam(targetTeam);
 
         teamRepository.save(targetTeam);
